@@ -21,4 +21,6 @@ namespace Globals
 {
 	extern BOOL sleepy;
 	extern BOOL cachefix;
+	//extern BOOL rdblock;
+	extern BOOL ftjReduce;
 }

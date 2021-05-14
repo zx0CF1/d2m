@@ -20,12 +20,12 @@ int EraseCacheFiles()
 {
 
 	CHAR path[MAX_PATH];
-	GetCurrentDirectoryA(MAX_PATH, path);
+	GetCurrentDirectoryA(MAX_PATH,path);
 
 	CHAR szSearch[MAX_PATH];
-	memset(szSearch, 0x00, MAX_PATH);
+	memset(szSearch,0x00,MAX_PATH);
 
-	strcpy_s(szSearch, path);
+	strcpy_s(szSearch,path);
 	PathAppendA(szSearch, "\\*.dat");
 
 	WIN32_FIND_DATAA FindFileData;
@@ -35,13 +35,14 @@ int EraseCacheFiles()
 		do
 		{
 			char FilePath[MAX_PATH];
-			memset(FilePath, 0x00, MAX_PATH);
+			memset(FilePath,0x00,MAX_PATH);
 
-			strcpy_s(FilePath, path);
+			strcpy_s(FilePath,path);
 			PathAppendA(FilePath, FindFileData.cFileName);
 			DeleteFileA(FilePath);
 
-		} while (FindNextFileA(hFind, &FindFileData));
+		}
+		while (FindNextFileA(hFind, &FindFileData));
 
 		FindClose(hFind);
 	}

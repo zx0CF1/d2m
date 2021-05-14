@@ -3,18 +3,25 @@
 
 BOOL Globals::sleepy = FALSE;
 BOOL Globals::cachefix = FALSE;
+//BOOL Globals::rdblock = FALSE;
+BOOL Globals::ftjReduce = FALSE;
 
 BOOL WINAPI DllMain(HINSTANCE hDll,DWORD dwReason,LPVOID lpReserved) 
 {
 	if(dwReason==DLL_PROCESS_ATTACH) 
 	{
 		DisableThreadLibraryCalls(hDll);
-
-		if(GetModuleHandleA("Game.exe"))
-		{
-			LoadLibraryA("D2GFX.dll");
-			InstallPatches();
-		}
+		LoadLibraryA("D2Client.dll");
+		LoadLibraryA("Bnclient.dll");
+		LoadLibraryA("kernel32.dll");
+		LoadLibraryA("PD2_EXT.dll");
+		//LoadLibraryA("ProjectDiablo.dll");
+		LoadLibraryA("D2Net.dll");
+		LoadLibraryA("Fog.DLL");
+		LoadLibraryA("user32.dll");
+		LoadLibraryA("D2GFX.dll");
+		LoadLibraryA("D2WIN.dll");
+		Install();
 	}
 	if (dwReason == DLL_PROCESS_DETACH)
 		RemovePatches();
@@ -24,9 +31,19 @@ BOOL WINAPI DllMain(HINSTANCE hDll,DWORD dwReason,LPVOID lpReserved)
 
 VOID WINAPI Install()
 {
-	sLine* Command;
+	sLine *Command;
+
+	
 
 	ParseCommandLine(GetCommandLineA());
+
+	Command = GetCommand("-ftj");
+	if(Command)
+		Globals::ftjReduce = TRUE;
+
+	/*Command = GetCommand("-rd");
+	if(Command)
+		Globals::rdblock = TRUE;*/
 
 	Command = GetCommand("-cachefix");
 	if(Command)
@@ -38,23 +55,18 @@ VOID WINAPI Install()
 
 	DefineOffsets();
 	InstallPatches();
-
-	Command = GetCommand("-mpq");
-	if (Command)
-	{
-		D2_InitMPQ(Command->szText, 0, 0, 3000);
-	}
 }
 
 DWORD WINAPI Unload(LPVOID lpParam)
 {
 	Sleep(100);
-	FreeLibraryAndExitThread(GetModuleHandleA("D2Multi.dll"),0);
+	FreeLibraryAndExitThread(GetModuleHandleA("D2M.dll"),0);
 	return 0;
 }
 
 VOID WINAPI Shutdown()
 {
-	CreateThread(0,0,Unload,0,0,0);
+	if (!Globals::cachefix && !Globals::sleepy)
+		CreateThread(0,0,Unload,0,0,0);
 }
 

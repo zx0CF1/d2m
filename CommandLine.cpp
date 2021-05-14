@@ -13,39 +13,40 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#include "corecrt_wstring.h"
+
 #include "main.h"
 
 CArrayEx<sLine*, sLine*> aCommand;
 
 //Commands.
 sLine CLine[] = {
-	{"-handle", 0},
-	{"-multi", 0},
 	{"-title",0},
+	{"-cachefix",0},
 	{"-sleepy",0},
-	{"-cachefix",0}
+	{"-multi",0},
+	//{"-rd",0},
+	{"-ftj",0}
 };
 
-DWORD ParseStringForText(LPSTR Source, LPSTR text)
+DWORD ParseStringForText(LPSTR Source,LPSTR text)
 {
 	CHAR BUF[4059];
-	memset(BUF, 0x00, 4059);
+	memset(BUF,0x00,4059);
 
-	for (unsigned int x = 0; x < strlen(Source); x++)
+	for(unsigned int x = 0; x < strlen(Source); x++)
 	{
-		if (strlen(text) + x > strlen(Source))
+		if(strlen(text) + x > strlen(Source))
 			break;
 
-		for (unsigned int y = 0; y < strlen(text); y++)
+		for(unsigned int y = 0; y < strlen(text); y++)
 		{
-			INT cC = Source[x + y];
-			memcpy(BUF + strlen(BUF), (LPSTR)&cC, sizeof(cC));
+			INT cC = Source[x+y];
+			memcpy(BUF+strlen(BUF),(LPSTR)&cC,sizeof(cC));
 		}
-		if (!_strcmpi(BUF, text))
+		if(!_strcmpi(BUF,text))
 			return x;
 
-		memset(BUF, 0x00, 4059);
+		memset(BUF,0x00,4059);
 	}
 	return -1;
 }
@@ -53,42 +54,42 @@ DWORD ParseStringForText(LPSTR Source, LPSTR text)
 
 VOID ParseCommandLine(LPSTR Command)
 {
-	for (int x = 0; x < ArraySize(CLine); x++)
+	for(int x = 0; x < ArraySize(CLine); x++)
 	{
-		DWORD id = ParseStringForText(Command, CLine[x].Param);
-		if (id == -1)
+		DWORD id = ParseStringForText(Command,CLine[x].Param);
+		if(id == -1)
 			continue;
 
 		CHAR szText[100];
 		BOOL bStart = false;
 
-		memset(szText, 0x00, 100);
+		memset(szText,0x00,100);
 
-		if (!CLine[x].isBool)
+		if(!CLine[x].isBool)
 		{
-			for (unsigned int y = (id + (strlen(CLine[x].Param))); y < strlen(Command); y++)
+			for(unsigned int y = (id+(strlen(CLine[x].Param))); y < strlen(Command); y++)
 			{
-				if (Command[y] == '"')
-					if (bStart) {
+				if(Command[y] == '"')
+					if(bStart){
 						bStart = false;
 						break;
 					}
-					else {
+					else{
 						bStart = true;
 						y++;
 					}
 
-				int byt = Command[y];
+					int byt = Command[y];
 
-				if (bStart)
-					memcpy(szText + strlen(szText), (LPSTR)&byt, sizeof(byt));
+				if(bStart)
+					memcpy(szText+strlen(szText),(LPSTR)&byt,sizeof(byt));
 			}
 		}
-		sLine* sl = new sLine;
+		sLine *sl = new sLine;
 		sl->isBool = CLine[x].isBool;
-		strcpy_s(sl->Param, sizeof(sl->Param), CLine[x].Param);
-		if (!sl->isBool)
-			strcpy_s(sl->szText, sizeof(sl->szText), szText);
+		strcpy_s(sl->Param,sizeof(sl->Param),CLine[x].Param);
+		if(!sl->isBool)
+			strcpy_s(sl->szText,sizeof(sl->szText),szText);
 
 		aCommand.Add(sl);
 	}

@@ -18,14 +18,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #define _COMMANDLINE_H
 
 
-struct sLine {
-	CHAR Param[200];
+struct sLine{
+	CHAR Param[50];
 	BOOL isBool;
-	CHAR szText[300];
+	CHAR szText[100];
 };
 
 void ParseCommandLine(LPSTR Command);
-sLine* GetCommand(LPSTR Param);
+sLine *GetCommand(LPSTR Param);
 
 extern CArrayEx<sLine*, sLine*> aCommand;
 

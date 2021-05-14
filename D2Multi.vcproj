@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
-	Name="D2Multi"
+	Version="9.00"
+	Name="D2M"
 	ProjectGUID="{A81D4B58-5B41-40E3-8E6B-94310EA029EE}"
 	RootNamespace="Nohide"
 	Keyword="Win32Proj"
@@ -115,7 +115,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;NOHIDE_EXPORTS"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -179,6 +179,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\File.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 				<FileConfiguration
@@ -220,6 +224,14 @@
 			</File>
 			<File
 				RelativePath=".\D2Intercepts.h"
+				>
+			</File>
+			<File
+				RelativePath=".\D2Ptrs.h"
+				>
+			</File>
+			<File
+				RelativePath=".\File.h"
 				>
 			</File>
 			<File

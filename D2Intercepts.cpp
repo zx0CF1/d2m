@@ -1,10 +1,11 @@
 
 #include "main.h"
-
+#include "D2Intercepts.h"
 
 HMODULE __stdcall Multi(LPSTR Class, LPSTR Window){ return 0; }
 
-DWORD MainMenuAddress(){ return GetDllOffset("D2Launch.dll",0x18158); } //Backjmp.
+// DWORD MainMenuAddress(){ return GetDllOffset("D2Launch.dll",0x10B08); } //Backjmp. ORIGINAL
+DWORD MainMenuAddress() { return GetDllOffset("D2Launch.dll", 0x18158); } //Backjmp. MODIFIED 1.13C OFFSET
 
 VOID __declspec(naked) __fastcall InitMainMenu()
 {
@@ -17,56 +18,51 @@ VOID __declspec(naked) __fastcall InitMainMenu()
 	}
 }
 
-wchar_t* AnsiToUnicode(const char* str)
+HANDLE __stdcall Windowname(DWORD dwExStyle,LPCSTR lpClassName,LPCSTR lpWindowName,DWORD dwStyle,int x,int y,int nWidth,int nHeight,HWND hWndParent,HMENU hMenu,HINSTANCE hInstance,LPVOID lpParam)
 {
-	wchar_t* buf = NULL;
-	int len = MultiByteToWideChar(CP_ACP, 0, str, -1, buf, 0);
-	buf = new wchar_t[len];
-	MultiByteToWideChar(CP_ACP, 0, str, -1, buf, len);
-	return buf;
-}
-
-HANDLE __stdcall Windowname(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu,
-	HINSTANCE hInstance, LPVOID lpParam) {
 	ParseCommandLine(GetCommandLineA());
 
-	CHAR szClassName[200] = "CNAME";
-	CHAR szWindowName[200] = "Diablo II";
-	sLine* Command = GetCommand("-title");
+	CHAR szWindowName[100] = "Diablo II";
+	sLine *Command = GetCommand("-title");
 
-	if (Command)
-		if (strlen(Command->szText) > 1)
-			strcpy_s(szWindowName, sizeof(szWindowName), Command->szText);
+	if(Command)
+		if(strlen(Command->szText) > 1)
+			strcpy_s(szWindowName,sizeof(szWindowName),Command->szText);
 
-	Command = GetCommand("-mpq");
-	if (Command)
-	{
-		D2_InitMPQ(Command->szText, 0, 0, 3000);
-	}
-
-	//return CreateWindowExW(dwExStyle, lpClassName, szWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-	return CreateWindowExA(dwExStyle, lpClassName, szWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+	return CreateWindowExA(dwExStyle,lpClassName,szWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,hMenu,hInstance,lpParam);
 }
 
-HANDLE __stdcall CacheFix(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
+
+HANDLE __stdcall CacheFix(LPCSTR lpFileName,DWORD dwDesiredAccess,DWORD dwShareMode,LPSECURITY_ATTRIBUTES lpSecurityAttributes,DWORD dwCreationDisposition,DWORD dwFlagsAndAttributes,HANDLE hTemplateFile)
 {
 	EraseCacheFiles();
 	CHAR path[MAX_PATH];
-	GetCurrentDirectoryA(MAX_PATH, path);
+	GetCurrentDirectoryA(MAX_PATH,path);
 
 	if (Globals::cachefix)
 	{
-		srand((unsigned int)time(NULL));
-
+		ParseCommandLine(GetCommandLineA());
+		sLine *Command = GetCommand("-title");
 		CHAR Def[100] = "";
-		sprintf_s(Def, "\\bncache%d.dat", rand() % 0x2000);
+		
+		if (Command)
+		{
+			sprintf_s(Def,"\\bncache%d.dat", Command);
 
-		strcat_s(path, Def);
+			strcat_s(path,Def);
+		}
+		else
+		{
+			srand((unsigned int)time(NULL));
+			sprintf_s(Def,"\\bncache%d.dat",rand()%0x2000);
+
+			strcat_s(path,Def);
+		}
 	}
 	else
-		strcat_s(path, "\\bncache.dat");
+		strcat_s(path,"\\bncache.dat");
 
-	return CreateFileA(path, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+	return CreateFileA(path,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile);
 }
 
 void GameDraw(void)
@@ -82,8 +78,17 @@ void __declspec(naked) GameDraw_STUB()
 		call GameDraw;
 
 		POP ESI
-			POP EBX
-			POP ECX
-			RETN 4
+		POP EBX
+		POP ECX
+		RETN 4
 	}
+}
+
+void __declspec(naked) FailToJoin_Interception()
+{
+    __asm
+    {
+        cmp esi, 4000;
+        ret;
+    }
 }

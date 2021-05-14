@@ -11,23 +11,26 @@
 
 #ifdef _DEFINE_VARS
 
-#define D2OFFSET(o1)        o1
-#define D2FUNC(v1,t1,t2,o1) typedef t1 D2##_##v1##_t t2; D2##_##v1##_t *    D2##_##v1 = (D2##_##v1##_t *)D2OFFSET(o1);
-#define D2VAR(v1,t1,o1)     typedef t1 D2##_##v1##_t;    D2##_##v1##_t *p_##D2##_##v1 = (D2##_##v1##_t *)D2OFFSET(o1);
-#define D2ASM(v1,o1)        DWORD D2##_##v1 = D2OFFSET(o1);
+enum {DLLNO_D2CLIENT, DLLNO_D2COMMON, DLLNO_D2GFX, DLLNO_D2LANG, DLLNO_D2WIN, DLLNO_D2NET, DLLNO_D2GAME, DLLNO_D2LAUNCH, DLLNO_FOG, DLLNO_BNCLIENT, DLLNO_STORM, DLLNO_D2CMP, DLLNO_D2MULTI};
+
+#define DLLOFFSET(a1,b1) ((DLLNO_##a1)|((b1)<<8))
+#define FUNCPTR(d1,v1,t1,t2,o1)	typedef t1 d1##_##v1##_t t2; d1##_##v1##_t *d1##_##v1 = (d1##_##v1##_t *)DLLOFFSET(d1,o1);
+#define VARPTR(d1,v1,t1,o1)		typedef t1 d1##_##v1##_t;    d1##_##v1##_t *p_##d1##_##v1 = (d1##_##v1##_t *)DLLOFFSET(d1,o1);
+#define ASMPTR(d1,v1,o1)			DWORD d1##_##v1 = DLLOFFSET(d1,o1);
 
 #else
 
-#define D2FUNC(v1,t1,t2,o1) typedef t1 D2##_##v1##_t t2; extern D2##_##v1##_t *D2##_##v1;
-#define D2VAR(v1,t1,o1)     typedef t1 D2##_##v1##_t;    extern D2##_##v1##_t *p_##D2##_##v1;
-#define D2ASM(v1,o1)        extern DWORD D2##_##v1;
+#define FUNCPTR(d1,v1,t1,t2,o1)	typedef t1 d1##_##v1##_t t2; extern d1##_##v1##_t *d1##_##v1;
+#define VARPTR(d1,v1,t1,o1)		typedef t1 d1##_##v1##_t;    extern d1##_##v1##_t *p_##d1##_##v1;
+#define ASMPTR(d1,v1,o1)			extern DWORD d1##_##v1;
 
 #endif
-#define _D2PTRS_START D2_InitMPQ
+#define _D2PTRS_START	D2WIN_InitMPQ
 
-D2FUNC(InitMPQ, DWORD __fastcall, (const char* mpqfile, char* mpqname, int v4, int v5), 0x7E60) // 1.13C from BH.dll - line 515
+FUNCPTR(D2WIN, InitMPQ, DWORD __stdcall, (char *dll, char *mpqfile, char *mpqname, int v4, int v5), 0x7E50) 
+FUNCPTR(D2GFX, GetHwnd, HWND __stdcall, (void), 0xB0C0)
 
-#define _D2PTRS_END   D2_InitMPQ
+#define _D2PTRS_END	D2GFX_GetHwnd
 
 #undef FUNCPTR
 #undef VARPTR
