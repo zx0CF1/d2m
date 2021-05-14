@@ -1,4 +1,4 @@
-This version of D2Multi generates d2m.dll used by D2Bot # with kolbot in the 1.13d branch.
+This version of D2Multi generates d2m.dll used by D2Bot # with kolbot in the 1.13c (hopefully) branch.
 
 D2Multi was originally written as a multi-window loader. It was adapted as a loader for d2bot # with kolbot, d2m.dll, with features added to modify window loading behavior and with cache fix.
 
